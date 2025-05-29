@@ -17,6 +17,7 @@ typedef struct Threads_stats {
 // - dispatch: time the thread began processing the request
 // - t_stats: pointer to the current thread's statistics (must be updated by student)
 // - log: server-wide shared log (thread-safe access required)
+
 // TODO:
 // - must correctly track and update per-thread statistics inside the request handler.
 // - Update the following fields in `threads_stats`:
