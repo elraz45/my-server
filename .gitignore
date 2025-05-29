@@ -6,5 +6,6 @@ request.o
 segel.o
 server
 server.o
+queue.o
 public/favicon.ico
 public/output.cgi

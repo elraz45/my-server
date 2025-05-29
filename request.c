@@ -4,6 +4,8 @@
 
 #include "segel.h"
 #include "request.h"
+#include "log.h"
+extern server_log sharedLog;
 
 int append_stats(char *buf, threads_stats t_stats, struct timeval arrival, struct timeval dispatch)
 {
@@ -144,7 +146,7 @@ void requestServeDynamic(int fd, char *filename, char *cgiargs, struct timeval a
 	int buf_len = append_stats(buf, t_stats, arrival, dispatch);
 
 	Rio_writen(fd, buf, buf_len);
-	add_to_log(log, buf, buf_len);
+	add_to_log(sharedLog, buf, buf_len);
 	int pid = 0;
 	if ((pid = Fork()) == 0)
 	{
@@ -179,16 +181,16 @@ void requestServeStatic(int fd, char *filename, int filesize, struct timeval arr
 	int buf_len = append_stats(buf, t_stats, arrival, dispatch);
 
 	//  Writes out to the client socket the memory-mapped file
-	Rio_writen(fd, buf, buf_len);	// Send response headers
-	add_to_log(log, buf, buf_len);	// Log headers (for POST later)
-	Rio_writen(fd, srcp, filesize); // Send file content
+	Rio_writen(fd, buf, buf_len);		 // Send response headers
+	add_to_log(sharedLog, buf, buf_len); // Log headers (for POST later)
+	Rio_writen(fd, srcp, filesize);		 // Send file content
 	Munmap(srcp, filesize);
 }
 
-void requestServePost(int fd, struct timeval arrival, struct timeval dispatch, threads_stats t_stats, server_log log)
+void requestServePost(int fd, struct timeval arrival, struct timeval dispatch, threads_stats t_stats, server_log sharedLog)
 {
 	char header[MAXBUF], *body = NULL;
-	int body_len = get_log(log, &body);
+	int body_len = get_log(sharedLog, &body);
 	// put together response
 	sprintf(header, "HTTP/1.0 200 OK\r\n");
 	sprintf(header, "%sServer: OS-HW3 Web Server\r\n", header);
@@ -201,7 +203,7 @@ void requestServePost(int fd, struct timeval arrival, struct timeval dispatch, t
 }
 
 // handle a request
-void requestHandle(int fd, struct timeval arrival, struct timeval dispatch, threads_stats t_stats, server_log log)
+void requestHandle(int fd, struct timeval arrival, struct timeval dispatch, threads_stats t_stats, server_log sharedLog)
 {
 	// TODO:  should update static request stats
 	int is_static;
@@ -264,7 +266,7 @@ void requestHandle(int fd, struct timeval arrival, struct timeval dispatch, thre
 	else if (!strcasecmp(method, "POST"))
 	{
 		t_stats->post_req++;
-		requestServePost(fd, arrival, dispatch, t_stats, log);
+		requestServePost(fd, arrival, dispatch, t_stats, sharedLog);
 	}
 	else
 	{

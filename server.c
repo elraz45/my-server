@@ -9,7 +9,7 @@ pthread_cond_t not_empty;
 pthread_cond_t not_full;
 
 Queue wait_queue = NULL;
-server_log log;
+server_log sharedLog;
 
 void getargs(int *port, int *thread_num, int *queue_size, int argc, char *argv[])
 {
@@ -51,7 +51,7 @@ void *worker_thread(void *arg)
         struct timeval dispatch;
         gettimeofday(&dispatch, NULL);
 
-        requestHandle(connfd, arrival, dispatch, t, log);
+        requestHandle(connfd, arrival, dispatch, t, sharedLog);
         Close(connfd);
     }
 
@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
     getargs(&port, &threads_num, &queue_max_size, argc, argv);
 
     // Create the shared log
-    log = create_log();
+    sharedLog = create_log();
 
     // Init queue and synchronization
     wait_queue = queue_create(queue_max_size);
@@ -105,8 +105,8 @@ int main(int argc, char *argv[])
         pthread_mutex_unlock(&m);
     }
 
-    // Cleanup (unreachable here but good practice)
-    destroy_log(log);
+    // Cleanup 
+    destroy_log(sharedLog);
     queue_destroy(wait_queue);
     pthread_mutex_destroy(&m);
     pthread_cond_destroy(&not_empty);
