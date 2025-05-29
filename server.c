@@ -1,6 +1,8 @@
 #include "segel.h"
 #include "request.h"
 #include "log.h"
+#include "queue.h"
+
 
 //
 // server.c: A very, very simple web server
