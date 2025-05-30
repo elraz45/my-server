@@ -1,0 +1,11 @@
+client
+client.o
+log.o
+output.cgi
+request.o
+segel.o
+server
+server.o
+queue.o
+public/favicon.ico
+public/output.cgi
