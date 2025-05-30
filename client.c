@@ -83,7 +83,7 @@ void *client_thread(void *arg)
         return NULL;
     }
 
-    printf("[Thread %d] Connected to server.\n", args->id);
+    printf("[Thread %d] Connected to server. clientfd = %d\n", args->id, clientfd);
     clientSend(clientfd, args->filename, args->method);
     clientPrint(clientfd);
     Close(clientfd);

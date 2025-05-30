@@ -37,12 +37,12 @@ void *worker_thread(void *arg)
     {
         pthread_mutex_lock(&m);
 
-        while (queue_empty(wait_queue))
+        while (is_empty(wait_queue))
         {
             pthread_cond_wait(&not_empty, &m);
         }
 
-        struct timeval arrival = queue_head_arrival_time(wait_queue);
+        struct timeval arrival = get_head_arrival(wait_queue);
         int connfd = dequeue(wait_queue);
 
         pthread_cond_signal(&not_full);
@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
 
         */
 
-        if (queue_full(wait_queue))
+        if (is_full(wait_queue))
         {
             Close(connfd); // Drop tail: just close the connection
         }

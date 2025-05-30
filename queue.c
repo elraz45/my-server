@@ -18,10 +18,10 @@ struct Node
     Node next;
 };
 
-Node node_create(int value, struct timeval arrival)
+Node node_create(int data, struct timeval arrival)
 {
     Node node = (Node)malloc(sizeof(*node));
-    node->data = value;
+    node->data = data;
     node->arrival = arrival;
     node->next = NULL;
     return node;
@@ -38,82 +38,79 @@ Queue queue_create(int size)
     return queue;
 }
 
-bool queue_full(Queue queue)
+bool is_full(Queue q)
 {
-    if (queue->current_size == queue->max_size)
-        return true;
-    else
-        return false;
+    return q->current_size == q->max_size;
 }
 
-bool queue_empty(Queue queue)
+bool is_empty(Queue q)
 {
-    return queue->current_size == 0;
+    return q->current_size == 0;
 }
 
-void enqueue(Queue queue, int value, struct timeval arrival)
+void enqueue(Queue q, int data, struct timeval arrival)
 {
     // drop tail policy
-    if (queue_full(queue))
+    if (is_full(q))
         return;
 
-    Node new_node = node_create(value, arrival);
-    if (queue_empty(queue))
+    Node new_node = node_create(data, arrival);
+    if (is_empty(q))
     {
-        queue->head = new_node;
-        queue->tail = new_node;
+        q->head = new_node;
+        q->tail = new_node;
     }
     else
     {
-        queue->tail->next = new_node;
-        queue->tail = new_node;
+        q->tail->next = new_node;
+        q->tail = new_node;
     }
 
-    queue->current_size++;
+    q->current_size++;
 }
 
-struct timeval queue_head_arrival_time(Queue queue)
+struct timeval get_head_arrival(Queue q)
 {
-    if (queue_empty(queue))
+    if (is_empty(q))
         return (struct timeval){0};
-    return queue->head->arrival;
+    return q->head->arrival;
 }
 
-int dequeue(Queue queue)
+int dequeue(Queue q)
 {
-    if (queue_empty(queue))
+    if (is_empty(q))
         return -1;
-    Node temp = queue->head->next;
-    int value = queue->head->data;
-    free(queue->head);
-    if (temp == NULL)
+    Node next_node = q->head->next;
+    int data = q->head->data;
+    free(q->head);
+    if (next_node == NULL)
     {
-        queue->head = NULL;
-        queue->tail = NULL;
+        q->head = NULL;
+        q->tail = NULL;
     }
     else
     {
-        queue->head = temp;
+        q->head = next_node;
     }
-    queue->current_size--;
-    return value;
+    q->current_size--;
+    return data;
 }
 
-int queue_size(Queue queue)
+int queue_size(Queue q)
 {
-    return queue->current_size;
+    return q->current_size;
 }
 
-void queue_destroy(Queue queue)
+void queue_destroy(Queue q)
 {
-    Node current = queue->head;
+    Node cur = q->head;
     Node next = NULL;
-    while (current)
+    while (cur)
     {
-        next = current->next;
-        free(current);
-        current = next;
+        next = cur->next;
+        free(cur);
+        cur = next;
     }
 
-    free(queue);
+    free(q);
 }
