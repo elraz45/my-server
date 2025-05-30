@@ -109,7 +109,9 @@ int main(int argc, char *argv[])
 
         if (is_full(wait_queue))
         {
-            Close(connfd); // Drop tail: just close the connection
+            // Drop-tail
+            // printf("[server] Dropping request—over capacity at %ld.%06ld\n", arrival.tv_sec, arrival.tv_usec);
+            Close(connfd);
         }
         else
         {
