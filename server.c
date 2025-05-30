@@ -11,7 +11,7 @@ pthread_cond_t not_full;
 Queue wait_queue = NULL;
 server_log sharedLog;
 
-void getargs(int *port, int *thread_num, int *queue_size, int argc, char *argv[])
+void getargs(int *port, int *threads_num, int *queue_size, int argc, char *argv[])
 {
     if (argc < 4)
     {
@@ -19,7 +19,7 @@ void getargs(int *port, int *thread_num, int *queue_size, int argc, char *argv[]
         exit(1);
     }
     *port = atoi(argv[1]);
-    *thread_num = atoi(argv[2]);
+    *threads_num = atoi(argv[2]);
     *queue_size = atoi(argv[3]);
 }
 
