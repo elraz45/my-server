@@ -48,13 +48,13 @@ void *worker_thread(void *arg)
             pthread_cond_wait(&not_empty, &m);
         }
         // printf("[server] Worker thread %d processing request\n", thread_id);
-
+        
+        // Mark this thread as busy
+        active_count++;
+        
         // Dequeue the next pending request
         struct timeval arrival = get_head_arrival(wait_queue);
         int connfd = dequeue(wait_queue);
-
-        // Mark this thread as busy
-        active_count++;
 
         // Signal to the acceptor that there is now room for more pending connections
         pthread_cond_signal(&not_full);
