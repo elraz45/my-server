@@ -115,21 +115,16 @@ int main(int argc, char *argv[])
         gettimeofday(&arrival, NULL);
 
         pthread_mutex_lock(&m);
-        // Compute total = number of pending + number of active
-        int total = queue_size(wait_queue) + active_count;
 
         // If total has reached the combined limit, drop this connection
-        if (total >= threads_num + max_queue_size)
+        while (queue_size(wait_queue) + active_count >= threads_num + max_queue_size)
         {
-            printf("[server] Dropping request—over capacity at %ld.%06ld\n", arrival.tv_sec, arrival.tv_usec);
-            Close(connfd);
+            pthread_cond_wait(&not_full, &m); // Wait until space becomes available
         }
-        else
-        {
-            // Enqueue the new request; a worker will pick it immediately if available
-            enqueue(wait_queue, connfd, arrival);
-            pthread_cond_signal(&not_empty);
-        }
+        // Enqueue the new request
+        enqueue(wait_queue, connfd, arrival);
+        pthread_cond_signal(&not_empty);
+
         pthread_mutex_unlock(&m);
     }
 

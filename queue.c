@@ -50,7 +50,6 @@ bool is_empty(Queue q)
 
 void enqueue(Queue q, int data, struct timeval arrival)
 {
-    // drop tail policy
     if (is_full(q))
         return;
 
