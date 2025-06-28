@@ -5,24 +5,24 @@
 
 struct Queue
 {
-    int max_size;
     int current_size;
+    int max_size;
     Node head;
     Node tail;
 };
 
 struct Node
 {
+    Node next;
     int data;
     struct timeval arrival;
-    Node next;
 };
 
 Node node_create(int data, struct timeval arrival)
 {
     Node node = (Node)malloc(sizeof(*node));
-    node->data = data;
     node->arrival = arrival;
+    node->data = data;
     node->next = NULL;
     return node;
 }
@@ -30,10 +30,10 @@ Node node_create(int data, struct timeval arrival)
 Queue queue_create(int size)
 {
     Queue queue = (Queue)malloc(sizeof(*queue));
-    queue->head = NULL;
-    queue->tail = NULL;
     queue->current_size = 0;
     queue->max_size = size;
+    queue->tail = NULL;
+    queue->head = NULL;
 
     return queue;
 }
@@ -71,7 +71,9 @@ void enqueue(Queue q, int data, struct timeval arrival)
 struct timeval get_head_arrival(Queue q)
 {
     if (is_empty(q))
+    {
         return (struct timeval){0};
+    }
     return q->head->arrival;
 }
 
@@ -84,8 +86,8 @@ int dequeue(Queue q)
     free(q->head);
     if (next_node == NULL)
     {
-        q->head = NULL;
         q->tail = NULL;
+        q->head = NULL;
     }
     else
     {
