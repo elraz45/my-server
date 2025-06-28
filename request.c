@@ -5,6 +5,10 @@
 #include "segel.h"
 #include "request.h"
 #include "log.h"
+
+static int _first_dispatch_set = 0;
+static struct timeval _first_dispatch_time;
+
 extern server_log sharedLog;
 
 int append_stats(char *buf, threads_stats t_stats, struct timeval arrival, struct timeval dispatch)
@@ -205,6 +209,18 @@ void requestServePost(int fd, struct timeval arrival, struct timeval dispatch, t
 // handle a request
 void requestHandle(int fd, struct timeval arrival, struct timeval dispatch, threads_stats t_stats, server_log sharedLog)
 {
+	// Normalize dispatch to a relative time (so first dispatch == 0)
+	if (!_first_dispatch_set) {
+		_first_dispatch_time  = dispatch;
+		_first_dispatch_set   = 1;
+	}
+	dispatch.tv_sec  -= _first_dispatch_time.tv_sec;
+	dispatch.tv_usec -= _first_dispatch_time.tv_usec;
+	if (dispatch.tv_usec < 0) {
+		dispatch.tv_sec  -= 1;
+		dispatch.tv_usec += 1000000;
+	}
+
 	// TODO:  should update static request stats
 	int is_static;
 	struct stat sbuf;

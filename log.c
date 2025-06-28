@@ -3,6 +3,8 @@
 #include <pthread.h>
 #include "log.h"
 
+// #include <unistd.h>
+
 // Opaque struct definition
 struct Server_Log
 {
@@ -139,6 +141,8 @@ void add_to_log(server_log log, const char *data, int data_len)
     memcpy(log->buffer + log->size, data, data_len);
     log->size += data_len;
     log->buffer[log->size] = '\0';
+
+    usleep(200000); // 0.2 seconds
 
     pthread_mutex_lock(&log->lock);
     log->writing = 0;
